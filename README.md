@@ -1,89 +1,65 @@
-<p align="center">
-  <a href="https://www.gatsbyjs.com">
-    <img alt="Gatsby" src="https://thejs.dev/icons/icon-384x384.png" width="300" />
-  </a>
-</p>
+![2024-05-08 23 35 33](https://github.com/thejsdevsite/jsdev/assets/145098716/326bd9f0-f90e-48ba-83ce-09794ad032cf)
+A JS script to control your USB ~ no other dependencies required
+(https://github.com/s0919756/Only-use-JS.script-to-control-USB)
+// ==UserScript==
+// @name         USB操作JS腳本
+// @namespace    simple-usb-device-operation-script
+// @version      1
+// @description  用於與USB設備進行簡單的交互操作。
+// @author       腳本貓開發員s0919756
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
 
-# JS.dev
-[![Build Status][build-status]][build-url]
-[![Contribute on Github][gh-shield]][thejscgh]
-[![Node Version 12.13.0][node-shield]][node12130]
+(function() {
+  let usbDeviceRequested = false;
+  let globalErrorStatus = {
+    hasError: false, 
+    errorMessage: '' 
+  };
 
-[JS.dev][jsdev] is an open and transparent JavaScript development community. We welcome and publish contributions from members of the community, for a diverse range of topics covering development with JavaScript.
+  if ("usb" in navigator && !usbDeviceRequested) {
+    usbDeviceRequested = true; 
+    navigator.usb.requestDevice({ filters: [] }) 
+      .then(device => {
+        console.log('USB設備已連接:', device);
+      })
+      .catch(error => {
+        console.error('USB設備連接錯誤:', error);
+        globalErrorStatus.hasError = true;
+        globalErrorStatus.errorMessage = error.message;
+      });
+  }
 
-Our website is built with [GatsbyJS][gatsbyjs] and hosted on [Github Pages][gh-pages]. If you would like to request a feature, you can do so on our issues page, or submit through a pull request.
+  window.addEventListener('message', async (event) => {
+    if (event.origin !== 'Your backend script source') return;
+    if (event.data.type === 'pingRequest') {
+      fetch(event.data.url).then(response => response.text()).then(result => {
+        event.source.postMessage({ type: 'pingResponse', result: result }, event.origin);
+      }).catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  });
 
-## 📝 Contributing
+  let isFrontEndWorking = true;
+  const checkFrontEndStatus = setInterval(() => {
+    if (!isFrontEndWorking) {
+      clearInterval(checkFrontEndStatus);
+    }
+  }, 1000); 
 
-Our blog pages are a combination of markdown files and frontmatter formatting. To submit a new article, [create a pull request][thejscgh] on the content repository, and follow the guide in that project.
-
-## 🚀 Building locally
-
-This project makes use of git submodules:
-
-* [jsdev-content][thejscgh] for the blog content
-
-This project makes use of the [nvm][nvm] version manager, with [node version][node12130] `12.13.0`. To setup:
-
-```bash
-# Make sure the version of node exists first
-nvm install 12.13.0
-```
-
-On Linux/OSX/WSL:
-```bash
-nvm use
-```
-
-On Windows (use [Windows nvm][winnvm]):
-```bash
-# Windows terminal you have to use specific version
-nvm use 12.13.0
-```
-
-Run `npm install` to download and install the project dependencies. The easiest way to get GatsbyJS up and running in your local environment is to download the GatsbyJS CLI tools:
-
-```bash
-npm i -g gatsby gatsby-cli
-```
-
-At this point, your `content` directory will be empty. Let's go ahead and set that up:
-
-```bash
-git submodule update --init --recursive
-```
-
-We can now use GatsbyJS CLI to start development in a local environment:
-
-```bash
-gatsby develop
-```
-
-Gives us two local URLs:
-
-* Localhost development site: [http://localhost:8080](http://localhost:8080)
-* GraphQL: [http://localhost:8080/__graphql](http://localhost:8080/__graphql)
-
-## 💫 Deploy
-
-To build for production deployment, run the GatsbyJS `serve` command. Assets such as `sitemap.xml`, `feed.rss` and `robots.txt` will become available, while the GraphQL server will not be started.
-
-```bash
-npm run clean && npm run build && npm run serve
-```
-
-You can view the deployed site locally:
-
-* [http://localhost:9000/](http://localhost:9000/)
-
-[node12130]: https://nodejs.org/en/blog/release/v12.13.0/
-[thejscgh]: https://github.com/thejsdevsite/jsdev-content/
-[gh-shield]: https://img.shields.io/badge/style-github-orange?style=flat-square&label=contribute%20on&logo=github
-[node-shield]: https://img.shields.io/badge/style-12.13.0-brightgreen?style=flat-square&label=node
-[build-status]: https://travis-ci.com/thejsdevsite/jsdev.svg?branch=master
-[build-url]: https://travis-ci.com/thejsdevsite/jsdev
-[jsdev]: https://thejs.dev
-[gatsbyjs]: http://gatsbyjs.com
-[gh-pages]: https://pages.github.com/
-[nvm]: https://github.com/nvm-sh/nvm
-[winnvm]: https://github.com/coreybutler/nvm-windows
+  const originalCodeHash = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+  function calculateHash(code) {
+    // 
+  }
+  function checkForTampering(code) {
+    if (calculateHash(code) !== originalCodeHash) {
+      console.error('代碼已被篡改，將執行自毀程序。');
+      
+    }
+  }
+  setInterval(() => {
+    checkForTampering(document.body.innerHTML); 
+  }, 3600000);
+})();
